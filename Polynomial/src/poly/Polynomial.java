@@ -190,7 +190,7 @@ public class Polynomial {
 	}
 	private static boolean isZero(Node poly){ 
 		for(Node ptr = poly; ptr != null; ptr = ptr.next) {
-			if(poly.term.coeff != 0 && poly.term.degree != 0) {
+			if(poly.term.coeff != 0) {
 				return false;
 			}
 		}
