@@ -104,49 +104,32 @@ public class Expression {
     	// following line just a placeholder for compilation
     	expr = expr.replaceAll(" ", "");
     	expr = insertValue(expr, vars);
-    	if(!expr.contains("[") && !expr.contains("]")){
-			return simplify(expr);
-		}else{
-			while(expr.contains("[")){	//must account for arrays inside of arrays	
-				expr = solveArray(expr, arrays);
-			}	
-			return simplify(expr);
-		}
-    } 
-    //a BUNCH of helper methods below 
-    public static String solveArray(String expr, ArrayList<Array> arrays){ //simplifies expressions within array brackets & insert value for the arrays
-    	StringTokenizer st = new StringTokenizer(expr,"*+-/()]0123456789");
-    	String token = "";
-    	int nameLength = 0;
-    	while(st.hasMoreTokens()) {
-    		token = st.nextToken();
-    		if(token.contains("[")){
-    			nameLength = token.length()-1;
-    			break;
-    		}
-    	}
-    	int nameIndex = expr.indexOf('[')-nameLength; //the length of the name of the array
-    	String name = expr.substring(nameIndex, expr.indexOf('[')); //the name of the array
-    	String wholeArr = expr.substring(nameIndex,expr.indexOf(']')+1); //includes name[content]
-    	String expression = wholeArr.substring(wholeArr.indexOf('[')+1,wholeArr.indexOf(']'));
-    	int index = (int) simplify(expression);
-    	String value = arrValue(name, index, arrays);
-    	expr = expr.substring(0,nameIndex) + value + expr.substring(nameIndex+wholeArr.length());
-    	return expr;
-    }
-    private static float simplify(String expr){ //takes in expressions with NO ARRAYS, PASSED TEST CASES :))))
+    	System.out.println(expr);
     	Stack<Float> nums = new Stack<Float>();
-    	Stack<Character> ops = new Stack<Character>(); 
-    	StringTokenizer st = new StringTokenizer(expr, "*+-/()"); 
+    	Stack<Character> ops = new Stack<Character>();
+    	Stack<String> arrNames = new Stack<String>();
+     	StringTokenizer st = new StringTokenizer(expr, "*+-/()[]"); 
     	String token = "";
     	for(int i = 0; i < expr.length(); i++) {
     		char tmp = expr.charAt(i);
     		if(tmp >= '0' && tmp <= '9') {
-    			token=st.nextToken();
+    			token = st.nextToken();
     			nums.push(Float.parseFloat(token));
     			i += token.length()-1;
-    		}else if(tmp == '('){ 
+    		}else if(Character.isLetter(tmp)){
+    			token = st.nextToken();
+    			arrNames.push(token);
+    			i += token.length()-1;
+    		}else if(tmp == '(' || tmp == '['){ 
     			ops.push(tmp);
+    		}else if(tmp == ']'){
+    			while(ops.peek() != '['){		
+    				float num1 = nums.pop();
+    				float num2 = nums.pop();
+    				nums.push(doMath(ops.pop(), num1, num2));
+    			}
+    			nums.push(arrValue(arrNames.pop(), nums.pop().intValue(), arrays));
+    			ops.pop();
     		}else if(tmp == ')'){
     			while(ops.peek() != '('){
     				float num1 = nums.pop();
@@ -155,19 +138,23 @@ public class Expression {
     			}
     			ops.pop();
     		}else if(tmp == '+' || tmp == '-' || tmp == '*' || tmp == '/') {
-    			while(!ops.isEmpty() && order(tmp, ops.peek())){
+    			while(!ops.isEmpty() && order(tmp, ops.peek()) && ops.peek() != '['){
     				float num1 = nums.pop();
     				float num2 = nums.pop();
     				nums.push(doMath(ops.pop(), num1, num2));
     			}
     			ops.push(tmp);
     		}
+    		ops.print();
+    		nums.print();
+    		arrNames.print();
     	}
     	while(!ops.isEmpty()){
     		nums.push(doMath(ops.pop(), nums.pop(), nums.pop()));
     	}
     	return nums.pop();
-    }
+    } 
+    //a BUNCH of helper methods below 
     private static float doMath(char op, float num1, float num2){
     	if (op == '+'){//System.out.println(Float.toString(num1) + "+" + Float.toString(num2)); 
     		return num1+num2;
@@ -189,36 +176,29 @@ public class Expression {
     	}
     	return !((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-'));
     }
-    private static String arrValue(String name, int index, ArrayList<Array> arrays) {
+    private static float arrValue(String name, int index, ArrayList<Array> arrays) {
     	for(int i = 0; i < arrays.size(); i++) {
     		if(arrays.get(i).name.equals(name)) {
     			int[] arr = arrays.get(i).values;
-    			return Integer.toString(arr[index]);
+    			return (float)arr[index];
     		}
     	}
-    	return "0";
+    	return (float)0.0;
     }
     private static String insertValue(String expr, ArrayList<Variable> vars){
     	StringTokenizer st = new StringTokenizer(expr, delims);
     	String name = "";
     	while(st.hasMoreTokens()){
-    		int index = 0;
     		name = st.nextToken();
-    		index = vars.indexOf(name);
     		for(int i = 0; i < vars.size(); i++) {
     			if(vars.get(i).name.equals(name)){
-    				index = i;
+    				int value = vars.get(i).value;
+    				expr = expr.replaceFirst(name, Integer.toString(value));
     				break;
     			}
-    			index = -1;
     		}
-    		if(index != -1) {
-    			int value = vars.get(index).value;
-    			expr = expr.replaceAll(name, Integer.toString(value));
-    		}	
     	}
     	return expr;
-    	
     }
     private static boolean notMultipleV(ArrayList<Variable> arrayList, String token) {
     	for(int i = 0; i < arrayList.size(); i++){
