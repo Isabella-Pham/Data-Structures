@@ -8,7 +8,7 @@ import structures.Stack;
 
 public class Expression {
 
-	public static String delims = " \t*+-/()[]"; 
+	public static String delims = "\t*+-/()[]"; 
 			
     /**
      * Populates the vars list with simple variables, and arrays lists with arrays
@@ -28,27 +28,33 @@ public class Expression {
     	/** DO NOT create new vars and arrays - they are already created before being sent in
     	 ** to this method - you just need to fill them in.
     	 **/
-    	expr = expr.replaceAll(" ","");
-    	String delim = " \t*+-/()]0123456789"; //removed [ delim, added integers
+    	expr = expr.replaceAll(" ",""); //does not work for A[3] + B[4], must fix
+    	String delim = " \t*+-/()[]0123456789 ";
     	StringTokenizer st = new StringTokenizer(expr, delim);
     	String token = "";
-    	while(st.hasMoreTokens()){
-    		token = st.nextToken();
-    		if(token.indexOf('[') == -1){
-    			Variable newVar = new Variable(token);
-    			if(notMultipleV(vars, token)){
-    				vars.add(newVar);
-    			}
-    	      }
-    		while(token.indexOf('[') != -1){
-    			String arrName = token.substring(0,token.indexOf('['));
-    			token = token.substring(token.indexOf('[')+1);
-    			Array newArr = new Array(arrName);
-    			if(notMultipleA(arrays,arrName)) {
+    	Stack<String> names = new Stack<String>();
+    	for(int i = 0; i < expr.length(); i++) {
+    		char tmp = expr.charAt(i);
+    		if(Character.isLetter(tmp)){
+    			token = st.nextToken();
+    			names.push(token);
+    			i+=token.length()-1;
+    		}
+    		if(tmp == '[') {
+    			Array newArr = new Array(names.pop());
+    			if(notMultipleA(arrays, newArr.name)) {
     				arrays.add(newArr);
-    			}	
+    			}
     		}
     	}
+    	while(!names.isEmpty()){
+    		Variable newVar = new Variable(names.pop());
+			if(notMultipleV(vars, newVar.name)){
+				vars.add(newVar);
+			}
+    	}
+    	System.out.println(vars.toString());
+    	System.out.println(arrays.toString());
     }
     
     /**
@@ -103,12 +109,10 @@ public class Expression {
     	/** COMPLETE THIS METHOD **/
     	// following line just a placeholder for compilation
     	expr = expr.replaceAll(" ", "");
-    	expr = insertValue(expr, vars);
-    	System.out.println(expr);
     	Stack<Float> nums = new Stack<Float>();
     	Stack<Character> ops = new Stack<Character>();
     	Stack<String> arrNames = new Stack<String>();
-     	StringTokenizer st = new StringTokenizer(expr, "*+-/()[]"); 
+     	StringTokenizer st = new StringTokenizer(expr, "*+-/()[] "); 
     	String token = "";
     	for(int i = 0; i < expr.length(); i++) {
     		char tmp = expr.charAt(i);
@@ -118,7 +122,17 @@ public class Expression {
     			i += token.length()-1;
     		}else if(Character.isLetter(tmp)){
     			token = st.nextToken();
-    			arrNames.push(token);
+    			if(isVar(token,vars)) {
+    				for(int j = 0; j < vars.size(); j++) {
+    	    			if(vars.get(j).name.equals(token)){
+    	    				float value = (float) vars.get(j).value;
+    	    				nums.push(value);
+    	    				break;
+    	    			}
+    	    		}
+    			}else{
+    				arrNames.push(token);
+    			}
     			i += token.length()-1;
     		}else if(tmp == '(' || tmp == '['){ 
     			ops.push(tmp);
@@ -145,9 +159,6 @@ public class Expression {
     			}
     			ops.push(tmp);
     		}
-    		ops.print();
-    		nums.print();
-    		arrNames.print();
     	}
     	while(!ops.isEmpty()){
     		nums.push(doMath(ops.pop(), nums.pop(), nums.pop()));
@@ -185,20 +196,14 @@ public class Expression {
     	}
     	return (float)0.0;
     }
-    private static String insertValue(String expr, ArrayList<Variable> vars){
-    	StringTokenizer st = new StringTokenizer(expr, delims);
-    	String name = "";
-    	while(st.hasMoreTokens()){
-    		name = st.nextToken();
-    		for(int i = 0; i < vars.size(); i++) {
-    			if(vars.get(i).name.equals(name)){
-    				int value = vars.get(i).value;
-    				expr = expr.replaceFirst(name, Integer.toString(value));
-    				break;
-    			}
+    private static boolean isVar(String name, ArrayList<Variable> vars){
+    	for(int i = 0; i < vars.size(); i++){
+    		String varName = vars.get(i).name;
+    		if(varName.equals(name)){
+    			return true;
     		}
     	}
-    	return expr;
+    	return false;
     }
     private static boolean notMultipleV(ArrayList<Variable> arrayList, String token) {
     	for(int i = 0; i < arrayList.size(); i++){
