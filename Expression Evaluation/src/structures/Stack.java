@@ -87,7 +87,7 @@ public class Stack<T> {
 	public void clear() {
 		items.clear();
 	}
-	public void print(){
+	/*public void print(){
 		System.out.println(items.toString());
-	}
+	}*/
 }

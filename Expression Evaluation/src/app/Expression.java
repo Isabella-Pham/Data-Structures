@@ -53,8 +53,6 @@ public class Expression {
 				vars.add(newVar);
 			}
     	}
-    	System.out.println(vars.toString());
-    	System.out.println(arrays.toString());
     }
     
     /**
@@ -116,7 +114,7 @@ public class Expression {
     	String token = "";
     	for(int i = 0; i < expr.length(); i++) {
     		char tmp = expr.charAt(i);
-    		if(tmp >= '0' && tmp <= '9') {
+    		if(Character.isDigit(tmp)) {
     			token = st.nextToken();
     			nums.push(Float.parseFloat(token));
     			i += token.length()-1;
