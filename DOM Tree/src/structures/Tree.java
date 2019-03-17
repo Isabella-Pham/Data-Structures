@@ -51,7 +51,6 @@ public class Tree {
 				char tmp = line.charAt(i);
 				token = st.nextToken();
 				if(tmp == '<' && line.charAt(i+1) == '/'){
-					
 					while(!tags.peek().tag.equals(token)){
 						tags.pop();
 					}
