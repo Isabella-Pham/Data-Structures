@@ -40,12 +40,46 @@ public class Tree {
 			return;
 		}
 		root = new TagNode("html", null, null);
+		TagNode leaf = root;
 		String line = sc.nextLine();
+		Stack<TagNode> tags = new Stack<TagNode>();
 		while(sc.hasNextLine()){
 			line = sc.nextLine();
-			for(int i = 0; i < line.length(); i++){
-				if(line.charAt(i) == '<'){
+			StringTokenizer st = new StringTokenizer(line, "</>");
+			String token = "";
+			for(int i = 0; i < line.length(); i++){		
+				char tmp = line.charAt(i);
+				token = st.nextToken();
+				if(tmp == '<' && line.charAt(i+1) == '/'){
 					
+					while(!tags.peek().tag.equals(token)){
+						tags.pop();
+					}
+					leaf = tags.pop();
+					i += 2+token.length();
+					continue; 
+				}else if(tmp == '<'){
+					if(leaf.firstChild == null && isTag(leaf.tag)){
+						leaf.firstChild = new TagNode(token, null, null);
+						tags.push(leaf);
+						leaf = leaf.firstChild;
+					}else{
+						leaf.sibling = new TagNode(token, null, null);
+						tags.push(leaf);
+						leaf = leaf.sibling;
+					}
+					i += 1+token.length();
+				}else{
+					if(leaf.firstChild == null){
+						leaf.firstChild = new TagNode(token, null, null);
+						tags.push(leaf);
+						leaf = leaf.firstChild;
+					}else{
+						leaf.sibling = new TagNode(token, null, null);
+						tags.push(leaf);
+						leaf = leaf.sibling;
+					}
+					i += token.length()-1;
 				}
 			}
 		}
@@ -59,6 +93,21 @@ public class Tree {
 	 */
 	public void replaceTag(String oldTag, String newTag) {
 		/** COMPLETE THIS METHOD **/
+		root = replaceTag(root, oldTag, newTag);
+		
+	}
+	//helper method to use recursion w/ below
+	public TagNode replaceTag(TagNode curr, String oldTag, String newTag) {
+		if(oldTag.equals(curr.tag)){
+			curr.tag = newTag;
+		}
+		if(curr.sibling != null) {
+			curr.sibling = replaceTag(curr.sibling, oldTag, newTag);
+		}
+		if(curr.firstChild != null) {
+			curr.firstChild = replaceTag(curr.firstChild, oldTag, newTag);
+		}
+		return curr;
 	}
 	
 	/**
@@ -90,6 +139,15 @@ public class Tree {
 	 */
 	public void addTag(String word, String tag) {
 		/** COMPLETE THIS METHOD **/
+	}
+	private boolean isTag(String tag){
+		String[] tags = {"html","body","p","em", "b","table","tr","td","ol","ul","li"};
+		for(int i = 0; i < tags.length; i++) {
+			if(tag.equals(tags[i])){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
