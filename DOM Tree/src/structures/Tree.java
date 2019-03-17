@@ -35,7 +35,7 @@ public class Tree {
 	 * 
 	 * The root of the tree that is built is referenced by the root field of this object.
 	 */
-	public void build(){
+	public void build(){ //passed test cases
 		if(sc == null){
 			return;
 		}
@@ -90,7 +90,7 @@ public class Tree {
 	 * @param oldTag Old tag
 	 * @param newTag Replacement tag
 	 */
-	public void replaceTag(String oldTag, String newTag) {
+	public void replaceTag(String oldTag, String newTag) { //passed test cases
 		/** COMPLETE THIS METHOD **/
 		root = replaceTag(root, oldTag, newTag);
 		
@@ -115,37 +115,24 @@ public class Tree {
 	 * 
 	 * @param row Row to bold, first row is numbered 1 (not 0).
 	 */
-	public void boldRow(int row) {
-		if(getRow(root, row) != null){
-			TagNode bold = getRow(root, row);
-			TagNode column = bold.firstChild;
-			while(column != null){
-				column.firstChild = new TagNode("b", column.firstChild, null);
-				column = column.sibling;
-			}
+	public void boldRow(int row) { //passed test cases
+		if(row < 1){
+			return;
 		}
+		boldRow(root, root.firstChild, row);
 	}
-	//get row that needs to be bolded
-	private TagNode getRow(TagNode curr, int row){
-		/*if(curr.sibling == null && curr.firstChild == null){
-			return null;
-		}*/
-		if(row == 1){
-			return curr;
-		}else{
-			if(curr.tag.equals("tr")){
-				row--;
-			}
+	//helper method to use recursion w/ below
+	private void boldRow(TagNode prev, TagNode curr, int row){ 
+		if(curr == null){
+			return;
 		}
-		TagNode bold = null;
-		if(curr.sibling != null){
-			bold = getRow(curr.sibling, row);
+		if(row == 0 && curr.firstChild == null){
+			prev.firstChild = new TagNode("b",curr,null);
+		}else if(curr.tag.equals("tr")){
+			row--;
 		}
-		if(curr.firstChild != null && bold != null){
-			bold = getRow(curr.firstChild, row);
-		}
-		System.out.println(bold);
-		return bold;
+		boldRow(curr, curr.firstChild, row);
+		boldRow(curr, curr.sibling, row);
 	}
 	/**
 	 * Remove all occurrences of a tag from the DOM tree. If the tag is p, em, or b, all occurrences of the tag
