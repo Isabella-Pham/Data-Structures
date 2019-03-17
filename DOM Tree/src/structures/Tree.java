@@ -96,7 +96,7 @@ public class Tree {
 		
 	}
 	//helper method to use recursion w/ below
-	public TagNode replaceTag(TagNode curr, String oldTag, String newTag) {
+	private TagNode replaceTag(TagNode curr, String oldTag, String newTag) {
 		if(oldTag.equals(curr.tag)){
 			curr.tag = newTag;
 		}
@@ -116,9 +116,37 @@ public class Tree {
 	 * @param row Row to bold, first row is numbered 1 (not 0).
 	 */
 	public void boldRow(int row) {
-		/** COMPLETE THIS METHOD **/
+		if(getRow(root, row) != null){
+			TagNode bold = getRow(root, row);
+			TagNode column = bold.firstChild;
+			while(column != null){
+				column.firstChild = new TagNode("b", column.firstChild, null);
+				column = column.sibling;
+			}
+		}
 	}
-	
+	//get row that needs to be bolded
+	private TagNode getRow(TagNode curr, int row){
+		/*if(curr.sibling == null && curr.firstChild == null){
+			return null;
+		}*/
+		if(row == 1){
+			return curr;
+		}else{
+			if(curr.tag.equals("tr")){
+				row--;
+			}
+		}
+		TagNode bold = null;
+		if(curr.sibling != null){
+			bold = getRow(curr.sibling, row);
+		}
+		if(curr.firstChild != null && bold != null){
+			bold = getRow(curr.firstChild, row);
+		}
+		System.out.println(bold);
+		return bold;
+	}
 	/**
 	 * Remove all occurrences of a tag from the DOM tree. If the tag is p, em, or b, all occurrences of the tag
 	 * are removed. If the tag is ol or ul, then All occurrences of such a tag are removed from the tree, and, 
