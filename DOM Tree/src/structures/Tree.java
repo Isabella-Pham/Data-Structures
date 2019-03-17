@@ -141,19 +141,29 @@ public class Tree {
 	 * 
 	 * @param tag Tag to be removed, can be p, em, b, ol, or ul
 	 */
-	public void removeTag(String tag) {
+	public void removeTag(String tag){ //passed test cases
 		if(root == null){
 			return;
 		}
-		while(hasTag(root, tag)) {
+		while(hasTag(root, tag)){
 			removeTag(root, root.firstChild, tag);
 		}
 	}
+	//helper method to use recursion w/ below
 	private void removeTag(TagNode prev, TagNode curr, String tag){
 		if(prev == null || curr == null){
 			return;
 		}
 		if(tag.equals(curr.tag)){
+			if(tag.equals("ol") || tag.equals("ul")){
+				TagNode ptr = curr.firstChild;
+				while(ptr != null){
+					if(ptr.tag.equals("li")) {
+						ptr.tag = "p";
+					}
+					ptr = ptr.sibling;
+				}
+			}
 			if(prev.firstChild == curr){ //node to be deleted is child of previous
 				prev.firstChild = curr.firstChild;
 				//need to make last sibling of curr point to sibling of prev
@@ -163,14 +173,13 @@ public class Tree {
 				}
 				ptr.sibling = curr.sibling;	
 			}else if(prev.sibling == curr){ //node to be deleted is sibling of previous
-				TagNode temp = prev.sibling;
 				TagNode ptr = curr.firstChild;
-				prev.sibling = curr.firstChild;
 				while(ptr.sibling != null){
 					ptr = ptr.sibling; 
 				}
 				//the previous sibling becomes the last sibling of the upgraded node
-				ptr.sibling = temp;
+				ptr.sibling = curr.sibling;
+				prev.sibling = curr.firstChild;
 			}
 			return; 
 		}
