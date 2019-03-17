@@ -142,7 +142,51 @@ public class Tree {
 	 * @param tag Tag to be removed, can be p, em, b, ol, or ul
 	 */
 	public void removeTag(String tag) {
-		/** COMPLETE THIS METHOD **/
+		if(root == null){
+			return;
+		}
+		while(hasTag(root, tag)) {
+			removeTag(root, root.firstChild, tag);
+		}
+	}
+	private void removeTag(TagNode prev, TagNode curr, String tag){
+		if(prev == null || curr == null){
+			return;
+		}
+		if(tag.equals(curr.tag)){
+			if(prev.firstChild == curr){ //node to be deleted is child of previous
+				prev.firstChild = curr.firstChild;
+				//need to make last sibling of curr point to sibling of prev
+				TagNode ptr = curr.firstChild;
+				while(ptr.sibling != null){
+					ptr = ptr.sibling;
+				}
+				ptr.sibling = curr.sibling;	
+			}else if(prev.sibling == curr){ //node to be deleted is sibling of previous
+				TagNode temp = prev.sibling;
+				TagNode ptr = curr.firstChild;
+				prev.sibling = curr.firstChild;
+				while(ptr.sibling != null){
+					ptr = ptr.sibling; 
+				}
+				//the previous sibling becomes the last sibling of the upgraded node
+				ptr.sibling = temp;
+			}
+			return; 
+		}
+		prev = curr;
+		removeTag(prev, prev.firstChild, tag);
+		removeTag(prev, prev.sibling, tag);
+	}
+	private boolean hasTag(TagNode curr, String tag) {
+		if(curr == null){
+			return false;
+		}
+		if(tag.equals(curr.tag)) {
+			return true;
+		}
+		return hasTag(curr.firstChild, tag) || hasTag(curr.sibling, tag);
+		
 	}
 	
 	/**
