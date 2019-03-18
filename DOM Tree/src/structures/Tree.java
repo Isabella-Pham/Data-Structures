@@ -205,7 +205,35 @@ public class Tree {
 	 * @param tag Tag to be added
 	 */
 	public void addTag(String word, String tag) {
-		/** COMPLETE THIS METHOD **/
+		
+	}
+	public void addTag(TagNode prev, TagNode curr, String word, String tag){
+		if(prev == null || curr == null){
+			return; 
+		}
+		if(matches(word,curr.tag)){
+			if(prev.firstChild == curr) {
+				
+			}else if(prev.sibling == curr) {
+				
+			}
+		}
+		prev = curr;
+		addTag(prev, prev.firstChild, word, tag);
+		addTag(prev, prev.sibling, word, tag);
+	}
+	private boolean matches(String word, String nodeTag){ //returns whether or not the tag is the same as the word when not including punctuation and case
+		//passed test cases
+		nodeTag = nodeTag.toLowerCase();
+		word = word.toLowerCase();
+		char last = nodeTag.charAt(nodeTag.length()-1);
+		if(last == '!' || last == '?' || last == '.' || last == ';' || last == ':') {
+			nodeTag = nodeTag.substring(0,nodeTag.length()-1);
+		}
+		if(nodeTag.equals(word)){
+			return true;
+		}
+		return false;
 	}
 	private boolean isTag(String tag){
 		String[] tags = {"html","body","p","em", "b","table","tr","td","ol","ul","li"};
