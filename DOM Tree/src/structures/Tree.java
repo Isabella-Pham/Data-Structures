@@ -69,7 +69,7 @@ public class Tree {
 					}
 					i += 1+token.length();
 				}else{
-					if(leaf.firstChild == null){
+					if(leaf.firstChild == null && isTag(leaf.tag)){
 						leaf.firstChild = new TagNode(token, null, null);
 						tags.push(leaf);
 						leaf = leaf.firstChild;
@@ -145,9 +145,9 @@ public class Tree {
 		if(root == null){
 			return;
 		}
-		while(hasTag(root, tag)){
+		//while(hasTag(root, tag)){
 			removeTag(root, root.firstChild, tag);
-		}
+		//}
 	}
 	//helper method to use recursion w/ below
 	private void removeTag(TagNode prev, TagNode curr, String tag){
@@ -205,22 +205,74 @@ public class Tree {
 	 * @param tag Tag to be added
 	 */
 	public void addTag(String word, String tag) {
-		
+		if(root == null || word == null || tag == null){
+			return;
+		}
+		//while(!isTagged(root, root.firstChild, word, tag)) {
+			addTag(root, root.firstChild, word, tag);
+		//}	
 	}
 	public void addTag(TagNode prev, TagNode curr, String word, String tag){
 		if(prev == null || curr == null){
 			return; 
 		}
-		if(matches(word,curr.tag)){
-			if(prev.firstChild == curr) {
-				
-			}else if(prev.sibling == curr) {
-				
+		boolean cont = true;
+		StringTokenizer st = new StringTokenizer(curr.tag, " ");
+		String token = "";
+		boolean only = st.countTokens() == 1;
+		while(st.hasMoreTokens()){
+			token = st.nextToken();
+			if(matches(word,token)){
+				int i = curr.tag.indexOf(token);
+				String before = curr.tag.substring(0,i);
+				String after = curr.tag.substring(i+token.length());
+				TagNode tagged = new TagNode(token, null, null);
+				TagNode newTag = new TagNode(tag, tagged, curr.sibling);
+				boolean child = prev.firstChild == curr; //true if curr the child of prev, false if it is the sibling
+				if(i == 0) {
+					//if token is the first word of the tag
+					if(!only){ //tag is not the only word
+						TagNode afters = new TagNode(after, null, curr.sibling);
+						newTag.sibling = afters;
+					}
+					if(child){
+						prev.firstChild = newTag; 
+					}else{
+						prev.sibling = newTag;
+					}
+					cont = false;
+					addTag(newTag, newTag.sibling, word, tag);
+					//curr = newTag;
+				}else if(i == curr.tag.length()-token.length()){
+					//if token is the last word of the tag
+					TagNode befores = new TagNode(before, null, newTag);
+					if(child) {
+						prev.firstChild = befores;
+					}else {
+						prev.sibling = befores;
+					}
+					cont = false;
+					addTag(newTag, newTag.sibling, word, tag);
+				}else{
+					//token is not the first or last word of the tag
+					TagNode befores = new TagNode(before, null, newTag);
+					TagNode afters = new TagNode(after, null, curr.sibling);
+					newTag.sibling = afters;
+					if(child){
+						prev.firstChild = befores;
+					}else{
+						prev.sibling = befores;
+					}
+					cont = false;
+					addTag(afters, afters.sibling, word,tag);
+				}
 			}
+		}	
+		if(cont == true) {
+			addTag(curr, curr.sibling, word, tag);
+			addTag(curr, curr.firstChild, word, tag);
 		}
-		prev = curr;
-		addTag(prev, prev.firstChild, word, tag);
-		addTag(prev, prev.sibling, word, tag);
+			
 	}
 	private boolean matches(String word, String nodeTag){ //returns whether or not the tag is the same as the word when not including punctuation and case
 		//passed test cases
