@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="DOM Tree/src"/>
+	<classpathentry kind="src" path="Expression Evaluation/src"/>
+	<classpathentry kind="src" path="Polynomial/src"/>
+	<classpathentry kind="output" path="DOM Tree/bin"/>
+</classpath>
