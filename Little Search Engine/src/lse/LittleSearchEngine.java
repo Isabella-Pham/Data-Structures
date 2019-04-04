@@ -36,15 +36,65 @@ public class LittleSearchEngine {
 	 * 
 	 * @param docFile Name of the document file to be scanned and loaded
 	 * @return Hash table of keywords in the given document, each associated with an Occurrence object
-	 * @throws FileNotFoundException If the document file is not found on disk
+	 * @throws IOException 
 	 */
+	private HashSet<String> nwHashSet() throws IOException {
+		noiseWords = new HashSet<String>(143,2.0f);
+		FileInputStream f = new FileInputStream("noisewords.txt");
+		BufferedReader br = new BufferedReader(new InputStreamReader(f));
+		String line = br.readLine();
+		while(line != null) {
+			noiseWords.add(line);
+			line = br.readLine();
+		}
+		f.close();
+		return noiseWords;
+	}
 	public HashMap<String,Occurrence> loadKeywordsFromDocument(String docFile) 
 	throws FileNotFoundException {
-		/** COMPLETE THIS METHOD **/
-		
-		// following line is a placeholder to make the program compile
-		// you should modify it as needed when you write your code
-		return null;
+		try {
+			noiseWords = nwHashSet();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		HashMap<String, Occurrence> keywords = new HashMap<String, Occurrence>(1000, 2.0f);
+		FileInputStream f = new FileInputStream(docFile);
+		BufferedReader br = new BufferedReader(new InputStreamReader(f));
+		String line = null;
+		try {
+			line = br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while(line != null) {
+			StringTokenizer st = new StringTokenizer(line, " ");
+			String token = "";
+			while(st.hasMoreTokens()){
+				String key = getKeyword(token);
+				if(keywords.containsKey(key)){
+					//increment occurrence
+					keywords.get(key).frequency += 1;
+				}else {
+					//add to hashmap
+					Occurrence occ = new Occurrence(docFile, 1);
+					keywords.put(key, occ);
+				}
+			}
+		}
+		try {
+			f.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for(String name: keywords.keySet()){
+			String key = name.toString();
+			String value = keywords.get(name).toString();
+			System.out.println(key + " " + value);
+		}
+		return keywords;
 	}
 	
 	/**
@@ -77,14 +127,33 @@ public class LittleSearchEngine {
 	 * @param word Candidate word
 	 * @return Keyword (word without trailing punctuation, LOWER CASE)
 	 */
-	public String getKeyword(String word) {
-		/** COMPLETE THIS METHOD **/
-		
-		// following line is a placeholder to make the program compile
-		// you should modify it as needed when you write your code
-		return null;
+	public String getKeyword(String word){
+		StringBuilder str = new StringBuilder();
+		for(int i = 0; i < word.length(); i++){
+			char c = word.charAt(i);
+			if(Character.isLetter(c)){
+				str.append(c);
+			}else{
+				if(!isPunctuation(c)){
+					return null;
+				}
+				if(i < word.length()-1 && Character.isLetter(word.charAt(i+1))) {
+					return null;
+				}
+			}
+		}
+		String ret = str.toString().toLowerCase();
+		if(noiseWords.contains(ret)) {
+			return null;
+		}
+		return ret;
 	}
-	
+	private boolean isPunctuation(char c){
+		if(c == '.' || c == ',' || c == '?' || c == ':' || c == ';' || c == '!'){
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * Inserts the last occurrence in the parameter list in the correct position in the
 	 * list, based on ordering occurrences on descending frequencies. The elements
