@@ -64,14 +64,15 @@ public class LittleSearchEngine {
 		String line = null;
 		try {
 			line = br.readLine();
-		} catch (IOException e) {
+		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
 		while(line != null) {
 			StringTokenizer st = new StringTokenizer(line, " ");
 			String token = "";
 			while(st.hasMoreTokens()){
+				token = st.nextToken();
 				String key = getKeyword(token);
 				if(keywords.containsKey(key)){
 					//increment occurrence
@@ -80,7 +81,13 @@ public class LittleSearchEngine {
 					//add to hashmap
 					Occurrence occ = new Occurrence(docFile, 1);
 					keywords.put(key, occ);
-				}
+				}	
+			}
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		try {
@@ -90,6 +97,9 @@ public class LittleSearchEngine {
 			e.printStackTrace();
 		}
 		for(String name: keywords.keySet()){
+			if(name == null) {
+				continue;
+			}
 			String key = name.toString();
 			String value = keywords.get(name).toString();
 			System.out.println(key + " " + value);
@@ -166,11 +176,31 @@ public class LittleSearchEngine {
 	 *         your code - it is not used elsewhere in the program.
 	 */
 	public ArrayList<Integer> insertLastOccurrence(ArrayList<Occurrence> occs) {
-		/** COMPLETE THIS METHOD **/
-		
-		// following line is a placeholder to make the program compile
-		// you should modify it as needed when you write your code
-		return null;
+		if(occs.size() == 1){
+			return null;
+		}
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		int lo = 0;
+		int hi = occs.size()-2;
+		Occurrence item = occs.get(occs.size()-1);
+		occs.remove(occs.size()-1);
+		int mid = -1;
+		while(lo < hi){
+			mid = (lo+hi)/2;
+			int freq = occs.get(mid).frequency;
+			if(freq == item.frequency) {
+				occs.add(mid,item);
+				break;
+			}else if(freq < item.frequency) {
+				hi = mid-1;
+			}else{
+				lo = mid+1;
+			}
+		}
+		if(lo > hi){
+			occs.add(mid,item);
+		}
+		return ret;
 	}
 	
 	/**
@@ -223,11 +253,48 @@ public class LittleSearchEngine {
 	 *         returns null or empty array list.
 	 */
 	public ArrayList<String> top5search(String kw1, String kw2) {
-		/** COMPLETE THIS METHOD **/
-		
-		// following line is a placeholder to make the program compile
-		// you should modify it as needed when you write your code
-		return null;
+		ArrayList<Occurrence> top = new ArrayList<Occurrence>();
+		ArrayList<Occurrence> oc1 = keywordsIndex.get(kw1);
+		ArrayList<Occurrence> oc2 = keywordsIndex.get(kw2);
+		if(oc1 != null) {
+			for(int i = 0; i < oc1.size(); i++){
+				Occurrence occ = oc1.get(i);
+				if(top.size() == 0){
+					top.add(occ);
+					continue;
+				}
+				for(int j = 0; j < top.size(); j++){
+					if(occ.frequency > top.get(j).frequency){
+							top.add(j,occ);
+						if(top.size() > 5) {
+							top.remove(top.size()-1);
+						}
+					}
+				}
+			}
+		}
+		if(oc2 != null) {
+			for(int i = 0; i < oc2.size(); i++){
+				Occurrence occ = oc2.get(i);
+				if(top.size() == 0){
+					top.add(occ);
+					continue;
+				}
+				for(int j = 0; j < top.size(); j++){
+					if(occ.frequency > top.get(j).frequency){
+							top.add(j,occ);
+						if(top.size() > 5) {
+							top.remove(top.size()-1);
+						}
+					}
+				}
+			}
+		}
+		ArrayList<String> ret = new ArrayList<String>();
+		for(int i = 0; i < top.size(); i++){
+			ret.add(top.get(i).document);
+		}
+		return ret;
 	
 	}
 }

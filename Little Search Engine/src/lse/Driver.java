@@ -5,6 +5,6 @@ import java.util.*;
 public class Driver{
 	public static void main(String[] args) throws FileNotFoundException{
 		LittleSearchEngine engine = new LittleSearchEngine();
-		System.out.println(engine.loadKeywordsFromDocument("AliceCh1.txt"));
+		engine.loadKeywordsFromDocument("test.txt");
 	}
 }
