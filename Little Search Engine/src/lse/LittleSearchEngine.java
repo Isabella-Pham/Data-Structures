@@ -36,74 +36,50 @@ public class LittleSearchEngine {
 	 * 
 	 * @param docFile Name of the document file to be scanned and loaded
 	 * @return Hash table of keywords in the given document, each associated with an Occurrence object
-	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	private HashSet<String> nwHashSet() throws IOException {
+	private HashSet<String> nwHashSet() throws FileNotFoundException{
 		noiseWords = new HashSet<String>(143,2.0f);
-		FileInputStream f = new FileInputStream("noisewords.txt");
-		BufferedReader br = new BufferedReader(new InputStreamReader(f));
-		String line = br.readLine();
-		while(line != null) {
-			noiseWords.add(line);
-			line = br.readLine();
+		Scanner sc = new Scanner(new File("noisewords.txt"));
+		String word = "";
+		while(sc.hasNext()){
+			word = sc.next();
+			noiseWords.add(word);
 		}
-		f.close();
 		return noiseWords;
 	}
 	public HashMap<String,Occurrence> loadKeywordsFromDocument(String docFile) 
 	throws FileNotFoundException {
-		try {
-			noiseWords = nwHashSet();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(docFile == null) {
+			throw new FileNotFoundException();
 		}
+		noiseWords = nwHashSet();
 		HashMap<String, Occurrence> keywords = new HashMap<String, Occurrence>(1000, 2.0f);
-		FileInputStream f = new FileInputStream(docFile);
-		BufferedReader br = new BufferedReader(new InputStreamReader(f));
-		String line = null;
-		try {
-			line = br.readLine();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		while(line != null) {
-			StringTokenizer st = new StringTokenizer(line, " ");
-			String token = "";
-			while(st.hasMoreTokens()){
-				token = st.nextToken();
-				String key = getKeyword(token);
-				if(keywords.containsKey(key)){
-					//increment occurrence
-					keywords.get(key).frequency += 1;
-				}else {
-					//add to hashmap
-					Occurrence occ = new Occurrence(docFile, 1);
-					keywords.put(key, occ);
-				}	
+		Scanner sc = new Scanner(new File(docFile));
+		String token = "";
+		while(sc.hasNext()) {
+			token = sc.next();
+			String key = getKeyword(token);
+			if(key == null){
+				continue;
 			}
-			try {
-				line = br.readLine();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			if(keywords.containsKey(key)){
+				//increment occurrence
+				keywords.get(key).frequency += 1;
+			}else{
+				//add to hashmap
+				Occurrence occ = new Occurrence(docFile, 1);
+				keywords.put(key, occ);
+			}	
 		}
-		try {
-			f.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		for(String name: keywords.keySet()){
+		/*for(String name: keywords.keySet()){
 			if(name == null) {
 				continue;
 			}
 			String key = name.toString();
 			String value = keywords.get(name).toString();
 			System.out.println(key + " " + value);
-		}
+		}*/
 		return keywords;
 	}
 	
@@ -117,7 +93,25 @@ public class LittleSearchEngine {
 	 * @param kws Keywords hash table for a document
 	 */
 	public void mergeKeywords(HashMap<String,Occurrence> kws) {
-		/** COMPLETE THIS METHOD **/
+		for(String key:kws.keySet()){
+			Occurrence toAdd = kws.get(key);
+			if(keywordsIndex.containsKey(key)) {
+				keywordsIndex.get(key).add(toAdd);
+				insertLastOccurrence(keywordsIndex.get(key));
+			}else{
+				ArrayList<Occurrence> occs = new ArrayList<Occurrence>();
+				occs.add(toAdd);
+				keywordsIndex.put(key,occs);
+			}
+		}
+		/*for(String name: keywordsIndex.keySet()){
+			if(name == null) {
+				continue;
+			}
+			String key = name.toString();
+			String value = keywordsIndex.get(name).toString();
+			System.out.println(key + " " + value);
+		}*/
 	}
 	
 	/**
@@ -138,6 +132,9 @@ public class LittleSearchEngine {
 	 * @return Keyword (word without trailing punctuation, LOWER CASE)
 	 */
 	public String getKeyword(String word){
+		if(word == null) {
+			return null;
+		}
 		StringBuilder str = new StringBuilder();
 		for(int i = 0; i < word.length(); i++){
 			char c = word.charAt(i);
@@ -179,28 +176,32 @@ public class LittleSearchEngine {
 		if(occs.size() == 1){
 			return null;
 		}
-		ArrayList<Integer> ret = new ArrayList<Integer>();
+		ArrayList<Integer> mids = new ArrayList<Integer>();
 		int lo = 0;
-		int hi = occs.size()-2;
 		Occurrence item = occs.get(occs.size()-1);
 		occs.remove(occs.size()-1);
+		int hi = occs.size()-1;
 		int mid = -1;
-		while(lo < hi){
+		while(lo <= hi){
 			mid = (lo+hi)/2;
+			mids.add(mid);
 			int freq = occs.get(mid).frequency;
 			if(freq == item.frequency) {
-				occs.add(mid,item);
 				break;
-			}else if(freq < item.frequency) {
+			}else if(freq < item.frequency){
 				hi = mid-1;
 			}else{
 				lo = mid+1;
 			}
 		}
-		if(lo > hi){
-			occs.add(mid,item);
+		occs.add(mid,item);
+		if(occs.get(mid).frequency < occs.get(mid+1).frequency){
+			Occurrence temp = occs.get(mid);
+			occs.set(mid, occs.get(mid+1));
+			occs.set(mid+1, temp);
 		}
-		return ret;
+		//System.out.println(occs);
+		return mids;
 	}
 	
 	/**
@@ -254,6 +255,7 @@ public class LittleSearchEngine {
 	 */
 	public ArrayList<String> top5search(String kw1, String kw2) {
 		ArrayList<Occurrence> top = new ArrayList<Occurrence>();
+		//will kw1 or kw2 have punctuation or uppercase letters?
 		ArrayList<Occurrence> oc1 = keywordsIndex.get(kw1);
 		ArrayList<Occurrence> oc2 = keywordsIndex.get(kw2);
 		if(oc1 != null) {
