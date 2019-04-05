@@ -253,7 +253,7 @@ public class LittleSearchEngine {
 	 *         frequencies. The result size is limited to 5 documents. If there are no matches, 
 	 *         returns null or empty array list.
 	 */
-	public ArrayList<String> top5search(String kw1, String kw2) {
+	public ArrayList<String> top5search(String kw1, String kw2) { //NEED TO FIX
 		ArrayList<Occurrence> top = new ArrayList<Occurrence>();
 		//will kw1 or kw2 have punctuation or uppercase letters?
 		ArrayList<Occurrence> oc1 = keywordsIndex.get(kw1);
@@ -261,16 +261,14 @@ public class LittleSearchEngine {
 		if(oc1 != null) {
 			for(int i = 0; i < oc1.size(); i++){
 				Occurrence occ = oc1.get(i);
-				if(top.size() == 0){
+				if(top.size() < 5){
 					top.add(occ);
 					continue;
 				}
 				for(int j = 0; j < top.size(); j++){
 					if(occ.frequency > top.get(j).frequency){
-							top.add(j,occ);
-						if(top.size() > 5) {
-							top.remove(top.size()-1);
-						}
+						top.add(j,occ);
+						top.remove(top.size()-1);
 					}
 				}
 			}
@@ -278,16 +276,14 @@ public class LittleSearchEngine {
 		if(oc2 != null) {
 			for(int i = 0; i < oc2.size(); i++){
 				Occurrence occ = oc2.get(i);
-				if(top.size() == 0){
+				if(top.size() < 5){
 					top.add(occ);
 					continue;
 				}
 				for(int j = 0; j < top.size(); j++){
 					if(occ.frequency > top.get(j).frequency){
-							top.add(j,occ);
-						if(top.size() > 5) {
-							top.remove(top.size()-1);
-						}
+						top.add(j,occ);
+						top.remove(top.size()-1);
 					}
 				}
 			}

@@ -18,8 +18,10 @@ public class Driver{
 		HashMap<String, Occurrence> doc2 = engine.loadKeywordsFromDocument("WowCh1.txt");
 		engine.mergeKeywords(doc1);
 		engine.mergeKeywords(doc2);
-		for(String key:engine.keywordsIndex.keySet()) {
+		/*for(String key:engine.keywordsIndex.keySet()) {
 			System.out.println(key + " " + engine.keywordsIndex.get(key));
-		}
+		}*/
+		System.out.println(engine.top5search("deep", "world"));
+		
 	}
 }
