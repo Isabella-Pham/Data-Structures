@@ -21,7 +21,7 @@ public class Driver{
 		/*for(String key:engine.keywordsIndex.keySet()) {
 			System.out.println(key + " " + engine.keywordsIndex.get(key));
 		}*/
-		System.out.println(engine.top5search("deep", "world"));
+		System.out.println(engine.top5search("deep", null));
 		
 	}
 }

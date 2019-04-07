@@ -256,43 +256,92 @@ public class LittleSearchEngine {
 	public ArrayList<String> top5search(String kw1, String kw2) { //NEED TO FIX
 		ArrayList<Occurrence> top = new ArrayList<Occurrence>();
 		//will kw1 or kw2 have punctuation or uppercase letters?
-		ArrayList<Occurrence> oc1 = keywordsIndex.get(kw1);
-		ArrayList<Occurrence> oc2 = keywordsIndex.get(kw2);
-		if(oc1 != null) {
-			for(int i = 0; i < oc1.size(); i++){
-				Occurrence occ = oc1.get(i);
-				if(top.size() < 5){
-					top.add(occ);
-					continue;
-				}
-				for(int j = 0; j < top.size(); j++){
-					if(occ.frequency > top.get(j).frequency){
-						top.add(j,occ);
-						top.remove(top.size()-1);
-					}
-				}
-			}
+		ArrayList<Occurrence> oc1 = new ArrayList<Occurrence>();
+		ArrayList<Occurrence> oc2 = new ArrayList<Occurrence>();
+		if(keywordsIndex.containsKey(kw1)){
+			kw1 = getKeyword(kw1);
+			oc1 = keywordsIndex.get(kw1);
 		}
-		if(oc2 != null) {
+		if(keywordsIndex.containsKey(kw2)) {
+			kw2 = getKeyword(kw2);
+			oc2 = keywordsIndex.get(kw2);
+		}
+		if(!(oc2.isEmpty())) {
 			for(int i = 0; i < oc2.size(); i++){
-				Occurrence occ = oc2.get(i);
-				if(top.size() < 5){
-					top.add(occ);
-					continue;
-				}
-				for(int j = 0; j < top.size(); j++){
-					if(occ.frequency > top.get(j).frequency){
-						top.add(j,occ);
-						top.remove(top.size()-1);
+				Occurrence curr = oc2.get(i);
+				top = removeDupes(top);
+				if(top.size() == 0){
+					top.add(curr);
+				}else if(top.size() < 5){
+					for(int j = 0; j < 5; j++){
+						if(j < top.size() && curr.frequency > top.get(j).frequency){
+							top.add(j, curr);
+							break;
+						}else if(j > top.size()-1){
+							top.add(curr);
+							break;
+						}
+					}
+				}else{
+					for(int j = 0; j < 5; j++){
+						if(curr.frequency > top.get(j).frequency){
+							top.add(j, curr);
+							top.remove(4);
+							break;
+						}
 					}
 				}
 			}
 		}
+		top = removeDupes(top);
+		if(!(oc1.isEmpty())){
+			for(int i = 0; i < oc1.size(); i++){
+				Occurrence curr = oc1.get(i);
+				top = removeDupes(top);
+				if(top.size() == 0){
+					top.add(curr);
+				}else if(top.size() < 5){
+					for(int j = 0; j < 5; j++){
+						if(j < top.size() && curr.frequency >= top.get(j).frequency){
+							top.add(j, curr);
+							break;
+						}else if(j > top.size()-1){
+							top.add(curr);
+							break;
+						}
+					}
+				}else{
+					for(int j = 0; j < 5; j++){
+						if(curr.frequency >= top.get(j).frequency){
+							top.add(j, curr);
+							top.remove(4);
+							break;
+						}
+					}
+				}
+			}
+
+		}
+		top = removeDupes(top);
 		ArrayList<String> ret = new ArrayList<String>();
 		for(int i = 0; i < top.size(); i++){
 			ret.add(top.get(i).document);
 		}
 		return ret;
-	
+	}
+	private ArrayList<Occurrence> removeDupes(ArrayList<Occurrence> occs){
+		if(occs == null){
+			return null;
+		}
+		ArrayList<String> docs = new ArrayList<String>();
+		for(int i = 0; i < occs.size(); i++) {
+			Occurrence oc = occs.get(i);
+			if(docs.contains(oc.document)){
+				occs.remove(i);
+			}else {
+				docs.add(oc.document);
+			}
+		}
+		return occs;
 	}
 }
