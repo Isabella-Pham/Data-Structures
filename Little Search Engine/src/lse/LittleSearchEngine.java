@@ -72,14 +72,6 @@ public class LittleSearchEngine {
 				keywords.put(key, occ);
 			}	
 		}
-		/*for(String name: keywords.keySet()){
-			if(name == null) {
-				continue;
-			}
-			String key = name.toString();
-			String value = keywords.get(name).toString();
-			System.out.println(key + " " + value);
-		}*/
 		return keywords;
 	}
 	
@@ -104,14 +96,6 @@ public class LittleSearchEngine {
 				keywordsIndex.put(key,occs);
 			}
 		}
-		/*for(String name: keywordsIndex.keySet()){
-			if(name == null) {
-				continue;
-			}
-			String key = name.toString();
-			String value = keywordsIndex.get(name).toString();
-			System.out.println(key + " " + value);
-		}*/
 	}
 	
 	/**
@@ -200,7 +184,6 @@ public class LittleSearchEngine {
 			occs.set(mid, occs.get(mid+1));
 			occs.set(mid+1, temp);
 		}
-		//System.out.println(occs);
 		return mids;
 	}
 	
