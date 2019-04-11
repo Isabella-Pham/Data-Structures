@@ -38,22 +38,11 @@ public class LittleSearchEngine {
 	 * @return Hash table of keywords in the given document, each associated with an Occurrence object
 	 * @throws FileNotFoundException 
 	 */
-	private HashSet<String> nwHashSet() throws FileNotFoundException{
-		noiseWords = new HashSet<String>(143,2.0f);
-		Scanner sc = new Scanner(new File("noisewords.txt"));
-		String word = "";
-		while(sc.hasNext()){
-			word = sc.next();
-			noiseWords.add(word);
-		}
-		return noiseWords;
-	}
 	public HashMap<String,Occurrence> loadKeywordsFromDocument(String docFile) 
 	throws FileNotFoundException {
 		if(docFile == null) {
 			throw new FileNotFoundException();
 		}
-		noiseWords = nwHashSet();
 		HashMap<String, Occurrence> keywords = new HashMap<String, Occurrence>(1000, 2.0f);
 		Scanner sc = new Scanner(new File(docFile));
 		String token = "";
@@ -116,7 +105,10 @@ public class LittleSearchEngine {
 	 * @return Keyword (word without trailing punctuation, LOWER CASE)
 	 */
 	public String getKeyword(String word){
-		if(word == null) {
+		if(word == null || word.length() == 0) {
+			return null;
+		}
+		if(!Character.isLetter(word.charAt(0))){
 			return null;
 		}
 		StringBuilder str = new StringBuilder();

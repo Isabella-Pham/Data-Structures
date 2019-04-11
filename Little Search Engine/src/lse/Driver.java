@@ -5,9 +5,12 @@ import java.util.*;
 public class Driver{
 	public static void main(String[] args) throws FileNotFoundException{
 		LittleSearchEngine engine = new LittleSearchEngine();
-		Scanner sc = new Scanner(System.in);
+		/*Scanner sc = new Scanner(System.in);
 		System.out.println("Enter first letter of method: (g)etKeyword, (l)oadKeywordsFromDocument, (i)nsertLastOccurrence, (m)ergeKeywords, (t)op5search =>");
 		char c = sc.nextLine().charAt(0);
+		engine.makeIndex("noisewords.txt", "noisewords.txt");
+		System.out.println(engine.keywordsIndex);
+		
 		if(c == 'g') {
 			System.out.println("Enter word =>");
 			String word = sc.nextLine();
@@ -22,7 +25,7 @@ public class Driver{
 				String value = keywords.get(name).toString();
 				System.out.println(key + " " + value);
 			}
-		/*}else if(c == 'i'){
+		}else if(c == 'i'){
 			ArrayList<Occurrence> occs = new ArrayList<Occurrence>();
 			System.out.println("Enter numbers you would like to insert one by one, pressing enter between each number. The last number you enter will be the one that is inserted. Enter the word 'quit' when done");
 			String docFile = null;
@@ -42,7 +45,7 @@ public class Driver{
 				ArrayList<Occurrence> value = keywordsIndex.get(name);
 				int num = value.get(0).frequency;
 				System.out.println(num + " ");
-			}*/
+			}
 		}else if(c == 'm'){
 			System.out.println("Enter document names one by one, pressing enter between each file. Enter the word 'quit' when done");
 			String docFile = null;
@@ -79,6 +82,14 @@ public class Driver{
 		}else{
 			System.out.println("Invalid input, terminating program");
 			return;
+		}*/
+		engine.makeIndex("test.txt", "noiseWords.txt");
+		//System.out.println(engine.top5search("hi", "bye"));
+		HashMap<String, ArrayList<Occurrence>> keywordsIndex = engine.keywordsIndex;
+		for(String name: keywordsIndex.keySet()){
+			String key = name.toString();
+			ArrayList<Occurrence> value = keywordsIndex.get(name);
+			System.out.println(key + " " + value);
 		}
 	}
 }
