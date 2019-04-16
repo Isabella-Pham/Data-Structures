@@ -313,6 +313,7 @@ public class LittleSearchEngine {
 			Occurrence oc = occs.get(i);
 			if(docs.contains(oc.document)){
 				occs.remove(i);
+				i--;
 			}else {
 				docs.add(oc.document);
 			}
