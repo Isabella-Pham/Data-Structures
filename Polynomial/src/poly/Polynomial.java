@@ -110,9 +110,7 @@ public class Polynomial {
 				ptr1 = ptr1.next;
 			}
 		}
-		if(isZero(sum)){
-			return null; 
-		}
+		sum = deleteZero(sum);
 		return orderAscending(sum); 
 	}
 	
@@ -188,12 +186,19 @@ public class Polynomial {
 		}
 		return ret;
 	}
-	private static boolean isZero(Node poly){ 
+	private static Node deleteZero(Node poly){ 
+		Node prev = null;
+		Node front = poly; 
 		for(Node ptr = poly; ptr != null; ptr = ptr.next) {
-			if(poly.term.coeff != 0) {
-				return false;
+			if(poly.term.coeff == 0){
+				if(prev == null) {
+					front = poly.next;
+					continue;
+				}
+				prev.next = poly.next;
 			}
+			prev = poly; 
 		}
-		return true;
+		return front;
 	}
 }
