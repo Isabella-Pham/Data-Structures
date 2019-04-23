@@ -84,10 +84,17 @@ public class PartialTreeList implements Iterable<PartialTree> {
 	 * @return The initial partial tree list
 	 */
 	public static PartialTreeList initialize(Graph graph) {
-	
-		/* COMPLETE THIS METHOD */
-		
-		return null;
+		PartialTreeList ret = new PartialTreeList();
+		for(int i = 0; i < graph.vertices.length; i++) {
+			Vertex vx = graph.vertices[i];
+			PartialTree pt = new PartialTree(vx);
+			for(Vertex.Neighbor ptr = vx.neighbors; ptr != null; ptr = ptr.next){ //Vertex.Neighbor is a linked list
+				Arc arc = new Arc(vx, ptr.vertex, ptr.weight);
+				pt.getArcs().insert(arc);
+			}
+			ret.append(pt);
+		}
+		return ret;
 	}
 	
 	/**
@@ -98,8 +105,12 @@ public class PartialTreeList implements Iterable<PartialTree> {
 	 * @return Array list of all arcs that are in the MST - sequence of arcs is irrelevant
 	 */
 	public static ArrayList<Arc> execute(PartialTreeList ptlist) {
-		
-		/* COMPLETE THIS METHOD */
+		ArrayList<Arc> ret = new ArrayList<>();
+		while(ptlist.size() != 1){
+			PartialTree pt = ptlist.remove();
+			MinHeap<Arc> heap = pt.getArcs();
+			
+		}
 
 		return null;
 	}
