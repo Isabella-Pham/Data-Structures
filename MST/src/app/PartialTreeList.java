@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import structures.Arc;
-import structures.Graph;
-import structures.PartialTree;
-import structures.Vertex;
+import structures.*;
+
 
 /**
  * Stores partial trees in a circular linked list
@@ -107,13 +105,39 @@ public class PartialTreeList implements Iterable<PartialTree> {
 	public static ArrayList<Arc> execute(PartialTreeList ptlist) {
 		ArrayList<Arc> ret = new ArrayList<>();
 		while(ptlist.size() != 1){
-			PartialTree pt = ptlist.remove();
-			MinHeap<Arc> heap = pt.getArcs();
-			
+			//3. Remove the first partial tree PTX from L. Let PQX be PTX's priority queue.
+			PartialTree ptx = ptlist.remove();
+			MinHeap<Arc> pqx = ptx.getArcs(); 
+			//4. Remove the highest-priority arc from PQX. Say this arc is a. Let v1 and v2 be the two vertices connected by a, where v1 belongs to PTX
+			Arc a = pqx.deleteMin();
+			//5. If v2 also belongs to PTX, go back to Step 4 and pick the next highest priority arc, otherwise continue to the next step.
+			while(contains(ptx, a.getv2())){
+				a = pqx.deleteMin();
+			}
+			//6. Report a - this is a component of the minimum spanning tree.
+			ret.add(a);
+			//7. Find the partial tree PTY to which v2 belongs. Remove PTY from the partial tree list L. Let PQY be PTY's priority queue.
+			PartialTree pty = ptlist.removeTreeContaining(a.getv2());
+			//8. Combine PTX and PTY. This includes merging the priority queues PQX and PQY into a single priority queue. Append the resulting tree to the end of L.
+			ptx.getRoot().neighbors.next = pty.getRoot().neighbors;
+			/*when doing ptx.toString() it does not list all the vertices
+			 * System.out.println(ptx.toString());
+			System.out.println(pty.toString());
+			System.out.println();*/
+			ptx.merge(pty);
+			ptlist.append(ptx);
 		}
-
-		return null;
+		return ret;
+		
 	}
+	/*private static boolean contains(Vertex root, Vertex v2){
+		for(Vertex ptr = root; ptr != null; ptr = ptr.neighbors.next.vertex) {
+			if(v2.name.equals(ptr.name)) {
+				return true;
+			}
+		}
+		return false;
+	}*/
 	
     /**
      * Removes the tree that is at the front of the list.
@@ -147,11 +171,43 @@ public class PartialTreeList implements Iterable<PartialTree> {
      */
     public PartialTree removeTreeContaining(Vertex vertex) 
     throws NoSuchElementException {
-    		/* COMPLETE THIS METHOD */
-    	
-    		return null;
+    		if(rear == null) {
+    			throw new NoSuchElementException("Tree List is Empty");
+    		}
+    		PartialTree ret = null;
+    		Node prev = rear;
+    		Node ptr = rear.next;
+    		do{
+    			//System.out.println(ptr.tree.toString());
+    			//System.out.println();
+    			ret =  ptr.tree;
+    			if(contains(ret, vertex)){
+    				size--;
+    				if(size == 0) {
+    					rear = null; //CLL is empty
+    				}else{
+  						if(ptr == rear) {
+  							rear = prev; 
+  						}
+  						prev.next = ptr.next;    
+   					}	
+    				break;
+    			}
+    			prev = ptr;
+    			ptr = ptr.next;
+    		}while(ptr != rear.next);
+    		if(ret == null) {
+    			throw new NoSuchElementException("Tree is not in list");
+    		}
+    		return ret;
      }
-    
+    private static boolean contains(PartialTree pt, Vertex vertex) {
+    	Vertex v = vertex;
+    	while(v.parent != v) {
+    		v = v.parent;
+    	}
+    	return v == pt.getRoot();
+    }
     /**
      * Gives the number of trees in this list
      * 
