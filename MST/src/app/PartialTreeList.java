@@ -120,24 +120,21 @@ public class PartialTreeList implements Iterable<PartialTree> {
 			PartialTree pty = ptlist.removeTreeContaining(a.getv2());
 			//8. Combine PTX and PTY. This includes merging the priority queues PQX and PQY into a single priority queue. Append the resulting tree to the end of L.
 			ptx.getRoot().neighbors.next = pty.getRoot().neighbors;
-			/*when doing ptx.toString() it does not list all the vertices
-			 * System.out.println(ptx.toString());
-			System.out.println(pty.toString());
-			System.out.println();*/
+			//when doing ptx.toString() it does not list all the vertices
 			ptx.merge(pty);
 			ptlist.append(ptx);
+			//printTree(ptlist);
 		}
-		return ret;
-		
+		return ret;		
 	}
-	/*private static boolean contains(Vertex root, Vertex v2){
-		for(Vertex ptr = root; ptr != null; ptr = ptr.neighbors.next.vertex) {
-			if(v2.name.equals(ptr.name)) {
-				return true;
-			}
+	private static void printTree(PartialTreeList pst) {
+		Iterator<PartialTree> it = pst.iterator();
+		while(it.hasNext()) {
+			PartialTree curr = it.next();
+			System.out.println(curr.toString());
 		}
-		return false;
-	}*/
+		System.out.println();
+	}
 	
     /**
      * Removes the tree that is at the front of the list.
@@ -178,8 +175,6 @@ public class PartialTreeList implements Iterable<PartialTree> {
     		Node prev = rear;
     		Node ptr = rear.next;
     		do{
-    			//System.out.println(ptr.tree.toString());
-    			//System.out.println();
     			ret =  ptr.tree;
     			if(contains(ret, vertex)){
     				size--;
@@ -199,6 +194,7 @@ public class PartialTreeList implements Iterable<PartialTree> {
     		if(ret == null) {
     			throw new NoSuchElementException("Tree is not in list");
     		}
+    		//System.out.println(ret.toString());
     		return ret;
      }
     private static boolean contains(PartialTree pt, Vertex vertex) {
