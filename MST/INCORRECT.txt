@@ -1,0 +1,71 @@
+10
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+A B 9
+A C 30
+A D 40
+A E 25
+A F 34
+A G 33
+A H 45
+A I 43
+A J 45
+B C 25
+B D 36
+B E 16
+B F 41
+B G 45
+B H 45
+B I 32
+B J 44
+C D 40
+C E 27
+C F 30
+C G 30
+C H 45
+C I 43
+C J 44
+D E 42
+D F 40
+D G 40
+D H 44
+D I 41
+D J 45
+E F 27
+E G 33
+E H 45
+E I 30
+E J 43
+F G 35
+F H 45
+F I 14
+F J 45
+G H 45
+G I 34
+G J 44
+H I 45
+H J 45
+I J 45
+E F 45
+E G 38
+E H 45
+E I 41
+E J 45
+F G 45
+F H 35
+F I 45
+F J 42
+G H 45
+G I 45
+G J 45
+H I 45
+H J 36
+I J 45

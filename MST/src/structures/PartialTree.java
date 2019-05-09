@@ -5,7 +5,7 @@ public class PartialTree {
 	/**
 	 * The root of the partial tree
 	 */
-	private Vertex root;
+	private Vertex root; 
     
 	/**
 	 * The arcs included in this partial tree
@@ -55,6 +55,10 @@ public class PartialTree {
      * @see java.lang.Object#toString()
      */
     public String toString() {
+    	String vert = "";
+    	for(Vertex.Neighbor ptr = root.neighbors; ptr != null; ptr = ptr.next) {
+    		vert += ptr.vertex.name;
+    	}
     	String ret = "Vertices: " + root.toString();
     	ret += "  PQ: " + arcs;
     	return ret;
