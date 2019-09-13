@@ -5,4 +5,4 @@ Expression Evaluation: 80/80
 Little Search Engine: 71/80
 MST: 80/80
 Polynomial: 80/80
-DOM Tree: not good lmao
+DOM Tree: not good lmao dwbi 
